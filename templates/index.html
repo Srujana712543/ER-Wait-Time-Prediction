@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Wait Time Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Predict ER Wait Time</h2>
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="arrivalHour">Arrival Hour</label>
+                <input type="number" class="form-control" id="arrivalHour" placeholder="Enter hour (0-23)" required>
+            </div>
+            <div class="form-group">
+                <label for="arrivalWeekday">Arrival Weekday</label>
+                <input type="number" class="form-control" id="arrivalWeekday" placeholder="Enter weekday (0=Monday, 6=Sunday)" required>
+            </div>
+            <div class="form-group">
+                <label for="arrivalMonth">Arrival Month</label>
+                <input type="number" class="form-control" id="arrivalMonth" placeholder="Enter month (1-12)" required>
+            </div>
+            <div class="form-group">
+                <label for="timeOfDay">Time of Day</label>
+                <select class="form-control" id="timeOfDay" required>
+                    <option value="0">Morning</option>
+                    <option value="1">Afternoon</option>
+                    <option value="2">Evening</option>
+                    <option value="3">Night</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="staffAvailable">Staff Available</label>
+                <input type="number" class="form-control" id="staffAvailable" placeholder="Enter staff available" required>
+            </div>
+            <div class="form-group">
+                <label for="patientAcuity">Patient Acuity Level</label>
+                <input type="number" class="form-control" id="patientAcuity" placeholder="Enter patient acuity level (1-5)" required>
+            </div>
+            <button type="button" class="btn btn-primary btn-block" onclick="predictWaitTime()">Predict Wait Time</button>
+        </form>
+        <div id="result" class="mt-4 text-center"></div>
+    </div>
+
+    <script>
+        function predictWaitTime() {
+            const data = {
+                arrival_hour: document.getElementById("arrivalHour").value,
+                arrival_weekday: document.getElementById("arrivalWeekday").value,
+                arrival_month: document.getElementById("arrivalMonth").value,
+                time_of_day: document.getElementById("timeOfDay").value,
+                staff_available: document.getElementById("staffAvailable").value,
+                patient_acuity: document.getElementById("patientAcuity").value
+            };
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = `<h4>Predicted Wait Time: ${data.wait_time} minutes</h4>`;
+            })
+            .catch(error => {
+                document.getElementById("result").innerHTML = `<h4 class="text-danger">Error: ${error.message}</h4>`;
+            });
+        }
+    </script>
+</body>
+</html>
